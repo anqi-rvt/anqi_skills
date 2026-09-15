@@ -109,12 +109,12 @@ def test_find_local_asset_refs_returned_paths_stay_relative_to_unresolved_base_d
     # the traversal check), so its return value must still support
     # `path.relative_to(base_dir)` even when the caller passed an
     # unresolved/relative base_dir (e.g. sync.py calling it with
-    # qmd_path.parent, a relative "example" path from the CWD) — a mismatch
+    # qmd_path.parent, a relative "example" path from the CWD). A mismatch
     # here raises ValueError at sync time.
     (tmp_path / "assets").mkdir()
     (tmp_path / "assets" / "x.png").write_bytes(b"data")
     monkeypatch.chdir(tmp_path)
-    relative_base_dir = Path("assets").parent  # "." — deliberately unresolved
+    relative_base_dir = Path("assets").parent  # ".": deliberately unresolved
     md = "![a](assets/x.png)"
     refs = find_local_asset_refs(md, base_dir=relative_base_dir)
     assert len(refs) == 1
@@ -124,7 +124,7 @@ def test_find_local_asset_refs_returned_paths_stay_relative_to_unresolved_base_d
 
 def test_find_local_asset_refs_finds_plain_hyperlinks_too(tmp_path):
     # Video fallback deliberately uses a plain [text](path) link, not an
-    # image embed — a local reference here must still get uploaded, or it
+    # image embed. A local reference here must still get uploaded, or it
     # gets pushed as a literal relative path (which renders as a broken
     # "https://assets/..." URL).
     (tmp_path / "assets").mkdir()

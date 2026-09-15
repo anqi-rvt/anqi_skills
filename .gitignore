@@ -9,8 +9,6 @@ __pycache__/
 # in as a working example of the standalone-HTML export
 !outline-wiki/example/sample.html
 
-# per-sync state: point-in-time snapshots, not meant to be durable history
-# (the attachment manifest itself *is* tracked — see design.md)
-*.comments-snapshot.json
-*.revisions-snapshot.json
-*.last-synced.md
+# per-sync state: a point-in-time snapshot, not meant to be durable
+# history (the attachment manifest itself *is* tracked; see design.md)
+*.outline-wiki-metadata.json

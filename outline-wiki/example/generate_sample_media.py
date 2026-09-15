@@ -1,7 +1,7 @@
 """Generate placeholder media (PNG, GIF, MP4, SVG) for the outline-wiki
 sample fixture (example/sample.qmd).
 
-Deps (not in requirements.txt — only this script needs them):
+Deps (not in requirements.txt: only this script needs them):
     pip install pillow imageio imageio-ffmpeg
 """
 

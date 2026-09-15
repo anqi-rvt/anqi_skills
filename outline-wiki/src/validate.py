@@ -1,10 +1,10 @@
 """Local validation for a `.qmd` before it ever touches Outline.
 
 Checks, each reported independently rather than stopping at the first
-failure: the mermaid/Quarto compile (via render.render_html — same error
+failure: the mermaid/Quarto compile (via render.render_html, same error
 output the vendored render_md.py itself produces), balanced math
 delimiters, and URL syntax/reachability. Imported by sync.py, which runs
-this as a gate before every sync unless told otherwise — see sync.py --help.
+this as a gate before every sync unless told otherwise. See sync.py --help.
 """
 
 from __future__ import annotations

@@ -34,7 +34,7 @@ class Manifest:
     def __init__(self, entries: dict[str, dict] | None = None):
         self.entries: dict[str, dict] = entries or {}
         # Hashes actually uploaded via resolve() during this process's
-        # lifetime — lets a caller report new-upload vs. reused-from-cache
+        # lifetime. Lets a caller report new-upload vs. reused-from-cache
         # counts without re-hashing files or diffing `entries` itself.
         self.newly_uploaded: set[str] = set()
 

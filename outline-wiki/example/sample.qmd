@@ -3,48 +3,36 @@ title: "Outline Wiki Test Page"
 outline_collection_id: cf8538c3-33a1-4bd2-b754-382a992321f4
 outline_parent_id: 24e6dc9d-6252-488b-b898-8e4bc90a4635
 outline_id: 6bea3fc9-d3ac-474c-adbe-986416c99b5c
-outline_last_synced_at: '2026-09-15T17:17:25.897Z'
+outline_last_synced_at: '2026-09-15T17:59:10.495Z'
 ---
 
-# Outline Wiki Test Page
+The tables below are the requirements of the outline-wiki sync project.
+Each section further down demonstrates one requirement live, so resyncing
+this page exercises the whole pipeline end-to-end.
 
-This page is a **test fixture**: every section below exercises one of the
-requirements in the tables underneath, so a resync of this file confirms
-the whole pipeline still works end-to-end. It has no subject matter of its
-own — every name, image, and value below is a generic placeholder.
-
-### P0 requirements (critical, mandatory)
+## P0 requirements (critical, mandatory)
 
 | Requirement | Mechanism |
 |---|---|
-| Text, headers, bold/italic/strikethrough | GFM headings; `**bold**`, `*italic*`, `~~strikethrough~~` |
-| URLs: hyperlink, and link to a header section | `[text](url)`; header link needs `page-url#h-<slug>` |
+| Text, headers, bold/italic/strikethrough | GFM headings (used throughout this page); **bold**, *italic*, and ~~strikethrough~~ together |
+| URLs: hyperlink, and link to a header section | A [hyperlink](https://www.getoutline.com) and a link to the [Images section](#images) below |
 | In-place rendered image, incl. animated GIF | Upload as attachment, then `![alt](attachment-url)` |
 | Inline code, inline math `$…$`, block math `$$…$$` | Backtick code; KaTeX for `$…$` and `$$…$$` |
 | Mermaid diagrams | Fenced ` ```mermaid ` block, rendered live |
-| Tables with text formatting | GFM pipe tables; inline formatting works in cells |
+| Tables with text formatting | GFM pipe tables; a cell can hold **formatted** text or an image: ![cell icon](assets/sample_icon.svg) |
 | Sync onto a page; get/snapshot its version | `documents.create`/`.update`; `revisions.list` to snapshot |
 | Collaborative comments from the team | Outline's native inline commenting |
 | Programmatic comment retrieval (source, timestamp, threads) | `comments.list`/`.info` with `includeAnchorText` |
 
-### P1 requirements (desired; degrade gracefully)
+## P1 requirements (desired; degrade gracefully)
 
 | Requirement | Mechanism |
 |---|---|
-| Video (private file or public provider) | No reliable in-place embed via markdown import — plain link only |
+| Video (private file or public provider) | No reliable in-place embed via markdown import; plain link only |
 | Vector images (SVG) | Upload as an attachment like any other image |
 | Export to standalone, single-file HTML | Direct `.qmd` → HTML render, independent of Outline |
 
-## Text formatting
-
-Plain text, **bold**, *italic*, and ~~strikethrough~~ all in one sentence to
-confirm they compose. A [plain hyperlink](https://www.getoutline.com) and a
-[link to the Tables section below](#tables) test both URL forms — `sync.py`
-rewrites the bare `#tables` fragment into the confirmed working
-`page-url#h-tables` form automatically (verify via a fresh navigation, not
-a same-page click).
-
-## Inline code and math
+## Code and math
 
 Inline code: `sample_variable`. Inline math: $E = mc^2$. Block math:
 
@@ -58,6 +46,13 @@ $$
 a + b = c \newline
 d + e = f
 $$
+
+Multiline code block:
+
+```python
+def add(a: int, b: int) -> int:
+    return a + b
+```
 
 ## Mermaid diagram
 
@@ -88,39 +83,19 @@ An animated GIF (changing color + text):
 
 ![Sample animation](assets/sample_animation.gif)
 
-A vector image (P1):
+A vector image:
 
 ![Sample icon](assets/sample_icon.svg)
 
 ## Video
 
-A locally-hosted MP4 (P1) — image-style embed proved unreliable across
+A locally-hosted MP4 (P1): image-style embed proved unreliable across
 resyncs (worked once, then silently broke). Use a plain text link instead:
 
 [Download: sample video (MP4)](assets/sample_video.mp4)
 
-A public provider URL — confirmed this renders as inert plaintext via
+A public provider URL: confirmed this renders as inert plaintext via
 markdown import, not an embed (Outline's rich-embed allowlist only
 triggers on a real paste-into-editor interaction):
 
 https://www.youtube.com/watch?v=dQw4w9WgXcQ
-
-## Tables
-
-| Row | Value | Status |
-|---|---|---|
-| **A** | 0.12 | ✅ *pass* |
-| **B** | -0.08 | ✅ *pass* |
-| **C** | 1.4 | ⚠️ **recheck** |
-
-## Table cell image tolerance
-
-| Label | Preview |
-|---|---|
-| Image | ![cell image](assets/sample_image.png) |
-| Icon | ![cell icon](assets/sample_icon.svg) |
-
-## Wrap-up
-
-If every section above rendered as intended, this confirms the P0/P1 tables
-above end-to-end for a real Outline workspace.

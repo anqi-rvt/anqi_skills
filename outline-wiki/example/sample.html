@@ -23,6 +23,41 @@ ul.task-list li input[type="checkbox"] {
 width: 0.8em;
 margin: 0 0.8em 0.2em -1em;  vertical-align: middle;
 }
+
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+}
+pre.numberSource { margin-left: 3em; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -5416,19 +5451,12 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#outline-wiki-test-page" id="toc-outline-wiki-test-page" class="nav-link active" data-scroll-target="#outline-wiki-test-page">Outline Wiki Test Page</a>
-  <ul>
-  <li><a href="#p0-requirements-critical-mandatory" id="toc-p0-requirements-critical-mandatory" class="nav-link" data-scroll-target="#p0-requirements-critical-mandatory">P0 requirements (critical, mandatory)</a></li>
+  <li><a href="#p0-requirements-critical-mandatory" id="toc-p0-requirements-critical-mandatory" class="nav-link active" data-scroll-target="#p0-requirements-critical-mandatory">P0 requirements (critical, mandatory)</a></li>
   <li><a href="#p1-requirements-desired-degrade-gracefully" id="toc-p1-requirements-desired-degrade-gracefully" class="nav-link" data-scroll-target="#p1-requirements-desired-degrade-gracefully">P1 requirements (desired; degrade gracefully)</a></li>
-  <li><a href="#text-formatting" id="toc-text-formatting" class="nav-link" data-scroll-target="#text-formatting">Text formatting</a></li>
-  <li><a href="#inline-code-and-math" id="toc-inline-code-and-math" class="nav-link" data-scroll-target="#inline-code-and-math">Inline code and math</a></li>
+  <li><a href="#code-and-math" id="toc-code-and-math" class="nav-link" data-scroll-target="#code-and-math">Code and math</a></li>
   <li><a href="#mermaid-diagram" id="toc-mermaid-diagram" class="nav-link" data-scroll-target="#mermaid-diagram">Mermaid diagram</a></li>
   <li><a href="#images" id="toc-images" class="nav-link" data-scroll-target="#images">Images</a></li>
   <li><a href="#video" id="toc-video" class="nav-link" data-scroll-target="#video">Video</a></li>
-  <li><a href="#tables" id="toc-tables" class="nav-link" data-scroll-target="#tables">Tables</a></li>
-  <li><a href="#table-cell-image-tolerance" id="toc-table-cell-image-tolerance" class="nav-link" data-scroll-target="#table-cell-image-tolerance">Table cell image tolerance</a></li>
-  <li><a href="#wrap-up" id="toc-wrap-up" class="nav-link" data-scroll-target="#wrap-up">Wrap-up</a></li>
-  </ul></li>
   </ul>
 </nav>
 </div>
@@ -5455,16 +5483,10 @@ window.Quarto = {
 </header>
 
 
-<section id="outline-wiki-test-page" class="level1">
-<h1>Outline Wiki Test Page</h1>
-<p>This page is a <strong>test fixture</strong>: every section below exercises one of the requirements in the tables underneath, so a resync of this file confirms the whole pipeline still works end-to-end. It has no subject matter of its own — every name, image, and value below is a generic placeholder.</p>
-<section id="p0-requirements-critical-mandatory" class="level3">
-<h3 class="anchored" data-anchor-id="p0-requirements-critical-mandatory">P0 requirements (critical, mandatory)</h3>
+<p>The tables below are the requirements of the outline-wiki sync project. Each section further down demonstrates one requirement live, so resyncing this page exercises the whole pipeline end-to-end.</p>
+<section id="p0-requirements-critical-mandatory" class="level2">
+<h2 class="anchored" data-anchor-id="p0-requirements-critical-mandatory">P0 requirements (critical, mandatory)</h2>
 <table class="caption-top table">
-<colgroup>
-<col style="width: 50%">
-<col style="width: 50%">
-</colgroup>
 <thead>
 <tr class="header">
 <th>Requirement</th>
@@ -5474,11 +5496,11 @@ window.Quarto = {
 <tbody>
 <tr class="odd">
 <td>Text, headers, bold/italic/strikethrough</td>
-<td>GFM headings; <code>**bold**</code>, <code>*italic*</code>, <code>~~strikethrough~~</code></td>
+<td>GFM headings (used throughout this page); <strong>bold</strong>, <em>italic</em>, and <del>strikethrough</del> together</td>
 </tr>
 <tr class="even">
 <td>URLs: hyperlink, and link to a header section</td>
-<td><code>[text](url)</code>; header link needs <code>page-url#h-&lt;slug&gt;</code></td>
+<td>A <a href="https://www.getoutline.com">hyperlink</a> and a link to the <a href="#images">Images section</a> below</td>
 </tr>
 <tr class="odd">
 <td>In-place rendered image, incl. animated GIF</td>
@@ -5494,7 +5516,7 @@ window.Quarto = {
 </tr>
 <tr class="even">
 <td>Tables with text formatting</td>
-<td>GFM pipe tables; inline formatting works in cells</td>
+<td>GFM pipe tables; a cell can hold <strong>formatted</strong> text or an image: <img role="img" aria-label="cell icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIgogICAgIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj4KICA8Y2lyY2xlIGN4PSI2MCIgY3k9IjYwIiByPSI1MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMWUzYTVmIiBzdHJva2Utd2lkdGg9IjQiLz4KICA8bGluZSB4MT0iNjAiIHkxPSIxMCIgeDI9IjYwIiB5Mj0iMTEwIiBzdHJva2U9IiM1YTJkNGEiIHN0cm9rZS13aWR0aD0iMiIvPgogIDxsaW5lIHgxPSIxMCIgeTE9IjYwIiB4Mj0iMTEwIiB5Mj0iNjAiIHN0cm9rZT0iIzVhMmQ0YSIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPGNpcmNsZSBjeD0iNjAiIGN5PSI2MCIgcj0iNiIgZmlsbD0iIzRhM2MxZSIvPgo8L3N2Zz4=" class="img-fluid" alt="cell icon"></td>
 </tr>
 <tr class="odd">
 <td>Sync onto a page; get/snapshot its version</td>
@@ -5511,8 +5533,8 @@ window.Quarto = {
 </tbody>
 </table>
 </section>
-<section id="p1-requirements-desired-degrade-gracefully" class="level3">
-<h3 class="anchored" data-anchor-id="p1-requirements-desired-degrade-gracefully">P1 requirements (desired; degrade gracefully)</h3>
+<section id="p1-requirements-desired-degrade-gracefully" class="level2">
+<h2 class="anchored" data-anchor-id="p1-requirements-desired-degrade-gracefully">P1 requirements (desired; degrade gracefully)</h2>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 50%">
@@ -5527,7 +5549,7 @@ window.Quarto = {
 <tbody>
 <tr class="odd">
 <td>Video (private file or public provider)</td>
-<td>No reliable in-place embed via markdown import — plain link only</td>
+<td>No reliable in-place embed via markdown import; plain link only</td>
 </tr>
 <tr class="even">
 <td>Vector images (SVG)</td>
@@ -5540,12 +5562,8 @@ window.Quarto = {
 </tbody>
 </table>
 </section>
-<section id="text-formatting" class="level2">
-<h2 class="anchored" data-anchor-id="text-formatting">Text formatting</h2>
-<p>Plain text, <strong>bold</strong>, <em>italic</em>, and <del>strikethrough</del> all in one sentence to confirm they compose. A <a href="https://www.getoutline.com">plain hyperlink</a> and a <a href="#tables">link to the Tables section below</a> test both URL forms — <code>sync.py</code> rewrites the bare <code>#tables</code> fragment into the confirmed working <code>page-url#h-tables</code> form automatically (verify via a fresh navigation, not a same-page click).</p>
-</section>
-<section id="inline-code-and-math" class="level2">
-<h2 class="anchored" data-anchor-id="inline-code-and-math">Inline code and math</h2>
+<section id="code-and-math" class="level2">
+<h2 class="anchored" data-anchor-id="code-and-math">Code and math</h2>
 <p>Inline code: <code>sample_variable</code>. Inline math: <span class="math inline">\(E = mc^2\)</span>. Block math:</p>
 <p><span class="math display">\[
 \int_0^\infty e^{-x^2}\,dx = \frac{\sqrt{\pi}}{2}
@@ -5555,6 +5573,9 @@ window.Quarto = {
 a + b = c \newline
 d + e = f
 \]</span></p>
+<p>Multiline code block:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> add(a: <span class="bu">int</span>, b: <span class="bu">int</span>) <span class="op">-&gt;</span> <span class="bu">int</span>:</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> a <span class="op">+</span> b</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 <section id="mermaid-diagram" class="level2">
 <h2 class="anchored" data-anchor-id="mermaid-diagram">Mermaid diagram</h2>
@@ -5600,7 +5621,7 @@ d + e = f
 <figcaption>Sample animation</figcaption>
 </figure>
 </div>
-<p>A vector image (P1):</p>
+<p>A vector image:</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img role="img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIgogICAgIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj4KICA8Y2lyY2xlIGN4PSI2MCIgY3k9IjYwIiByPSI1MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMWUzYTVmIiBzdHJva2Utd2lkdGg9IjQiLz4KICA8bGluZSB4MT0iNjAiIHkxPSIxMCIgeDI9IjYwIiB5Mj0iMTEwIiBzdHJva2U9IiM1YTJkNGEiIHN0cm9rZS13aWR0aD0iMiIvPgogIDxsaW5lIHgxPSIxMCIgeTE9IjYwIiB4Mj0iMTEwIiB5Mj0iNjAiIHN0cm9rZT0iIzVhMmQ0YSIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPGNpcmNsZSBjeD0iNjAiIGN5PSI2MCIgcj0iNiIgZmlsbD0iIzRhM2MxZSIvPgo8L3N2Zz4=" class="img-fluid figure-img"></p>
@@ -5610,65 +5631,10 @@ d + e = f
 </section>
 <section id="video" class="level2">
 <h2 class="anchored" data-anchor-id="video">Video</h2>
-<p>A locally-hosted MP4 (P1) — image-style embed proved unreliable across resyncs (worked once, then silently broke). Use a plain text link instead:</p>
+<p>A locally-hosted MP4 (P1): image-style embed proved unreliable across resyncs (worked once, then silently broke). Use a plain text link instead:</p>
 <p><a href="assets/sample_video.mp4">Download: sample video (MP4)</a></p>
-<p>A public provider URL — confirmed this renders as inert plaintext via markdown import, not an embed (Outline’s rich-embed allowlist only triggers on a real paste-into-editor interaction):</p>
+<p>A public provider URL: confirmed this renders as inert plaintext via markdown import, not an embed (Outline’s rich-embed allowlist only triggers on a real paste-into-editor interaction):</p>
 <p>https://www.youtube.com/watch?v=dQw4w9WgXcQ</p>
-</section>
-<section id="tables" class="level2">
-<h2 class="anchored" data-anchor-id="tables">Tables</h2>
-<table class="caption-top table">
-<thead>
-<tr class="header">
-<th>Row</th>
-<th>Value</th>
-<th>Status</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><strong>A</strong></td>
-<td>0.12</td>
-<td>✅ <em>pass</em></td>
-</tr>
-<tr class="even">
-<td><strong>B</strong></td>
-<td>-0.08</td>
-<td>✅ <em>pass</em></td>
-</tr>
-<tr class="odd">
-<td><strong>C</strong></td>
-<td>1.4</td>
-<td>⚠️ <strong>recheck</strong></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="table-cell-image-tolerance" class="level2">
-<h2 class="anchored" data-anchor-id="table-cell-image-tolerance">Table cell image tolerance</h2>
-<table class="caption-top table">
-<thead>
-<tr class="header">
-<th>Label</th>
-<th>Preview</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Image</td>
-<td><img role="img" aria-label="cell image" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAeAAAAEOCAIAAADe+FMwAAAS3ElEQVR4nO3dfXAU9f3A8d17zl2eLyEKouEpRSKPpZQA058OD4Kojba0BMo41IKObWeqtCgj2KJSHLQwTB+GdqhxxtY6jG0R7fCUyoMgUAXUKqUMSKSEQB4JSe75bn+zt/E4LpcYJOQ+ie/XPyZ7m83uqu/ZfPdJrSotVQAA8phSvQIAgOQINAAIRaABQCgCDQBCEWgAEIpAA4BQBBoAhCLQACAUgQYAoQg0AAhFoAFAKAINAEIRaAAQikADgFAEGgCEItAAIBSBBgChCDQACEWgAUAoAg0AQhFoABCKQAOAUAQaAIQi0AAgFIEGAKEINAAIRaABQCgCDQBCEWgAEIpAA4BQBBoAhCLQACAUgQYAoQg0AAhFoAFAKAINAEIRaAAQikADgFAEGgCEItAAIBSBBgChCDQACEWgAUAoAg0AQhFoABCKQAOAUAQaAIQi0AAgFIEGAKEINAAIRaABQCgCDQBCEWgAEIpAA4BQBBoAhCLQACAUgQYAoQg0AAhFoAFAKAINAEIRaAAQikADgFAEGgCEItAAIBSBBgChCDQACEWgAUAoAg0AQhFoABCKQAOAUAQaAIQi0AAgFIEGAKEINAAIRaABQCgCDQBCEWgAEIpAA4BQBBoAhCLQACAUgQYAoQg0AAhFoAFAKAINAEIRaAAQikADgFAEGgCEItAAIBSBBgChCDQACEWgAUAoAg0AQhFoABCKQAOAUAQaAIQi0AAgFIEGAKEINAAIRaABQCgCDQBCEWgAEIpAA4BQBBoAhCLQACAUgQYAoQg0AAhFoAFAKAINAEIRaAAQypLqFQA6Yx06NP/55xVFqV+xwv/RR92+s6yFhRlz59qGD1ddrkhzs/ftty+Vl/OvBEIQaHx5mQsK8lavVh2Otm9zcjSPJ9UrBVxGoPHllTZpklHni7/7nffttxVVVSKRVK8UcBmBxpeXKStLUZRIc7Nn585UrwuQBCcJ8eWlms2Komg+X6pXBEiOI+i+yTFhgnPqVFtRkSkjI+L3h2tq/B9+6Nm2LVRdnTirqqZNnuwoKbENGxY7ogyeOOHZtcv37rvxM1oGDOj3m98oilJdVmZ2u9Pvu88+ZowpMzPS1OQ/cqR506Zwfb0+bjB5smvWLMugQarFEjp71rNjR+v27e0Xcn7hQlNmZsZ3v2svLlYdjnBNje/IkdY33jAW0hXWwYNdd91lv+02U26uFgyGqqp8Bw60bt3aleC6V660jxplfG3Oz+//978riuI/erT+6aetgwblr12rb+bcuemlpa6ZM1WHI3jmTMtf/+r71796fo91y/ailyLQfVD2I484p0+PfWtyOk2FhdbCQtdddzWuXes7cODyR5mZucuX24YNi/9xs9ttLilxlJS0bt/etGFD++U7JkzI/uEPVZutbf68POeMGfbx42uXLMn83vecU6fG5rQOHpz18MPm/v3bXxphHz06+5FHYguxDByYPnCgc9q0hl/+MnDs2OduY0ZZWcacOfqocZRqtdqGDbMNG+aaNav+2WdDZ84o1yzr+993zphhfG0rKlKih9up2mM9sL0QSK0qLU31OqA7OSZOzH38cUVRWrZs8WzbFq6rUx0O24gRWT/4gTkvL9LaemHRIs3rNWZ2P/WUfexYLRhsfvVV7759kcZGU06OfdSozPnzTdnZiqLULVsWOH484XhQC4UijY1N5eWBDz5Q09L0w8y771YUJVxba87P91RUtPztb+G6Osstt+T8+MeWm29WNO3CQw+Fa2uvWEgwqGha85//7Nm9WwsGHV/7WtaDD5oyMzWfr+ZHP4odRye9zC79/vszFyxQFMV3+HDLpk3B06dVh8M+blzmggVmtzvc2Fj76KORpqbP3VdZDz7ouvvucG3thcWLYxNjR9CKonj3779UXq75/fZx47z79imRSM/vsW7cXvQ6jEH3NWmTJimKEjh27FJ5eai6WgsGI83NvkOHGn/1q0hLS7i62nLjjcac1qFD7WPHKopyqbxcD0RNjRYMhmtqPBUVDS+8YMxjzJBI0+pWrPAdOBDxeML19U0vvhg6d84YK/Ds2nXxt781fm/w5MnGX/9an19VY+MJMarF0vDccy1btkQuXdK8Xu/evXUrVmiBgOpwZMyf38kGmt3ujHnz9Hru2dOwalXgxAljG7179tQtW6Z5veacnIyysmvfk+GamsZ168L19ZGWFu/evUokkpI91mPbC4EIdF9j/B1tyspSrdb46YHjx88vWFD7s58FP/nEmGLp1y9YWRm5eNFTUZGwkMDHH+tHuJ9d55DAd+BA+MKFy99rWuyYsXXLlvg5g6dOaeGwXpnc3ISFePfv9x89Gj8ldOaMJzr2mlZS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" class="img-fluid" alt="cell image"></td>
-</tr>
-<tr class="even">
-<td>Icon</td>
-<td><img role="img" aria-label="cell icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIgogICAgIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj4KICA8Y2lyY2xlIGN4PSI2MCIgY3k9IjYwIiByPSI1MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMWUzYTVmIiBzdHJva2Utd2lkdGg9IjQiLz4KICA8bGluZSB4MT0iNjAiIHkxPSIxMCIgeDI9IjYwIiB5Mj0iMTEwIiBzdHJva2U9IiM1YTJkNGEiIHN0cm9rZS13aWR0aD0iMiIvPgogIDxsaW5lIHgxPSIxMCIgeTE9IjYwIiB4Mj0iMTEwIiB5Mj0iNjAiIHN0cm9rZT0iIzVhMmQ0YSIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPGNpcmNsZSBjeD0iNjAiIGN5PSI2MCIgcj0iNiIgZmlsbD0iIzRhM2MxZSIvPgo8L3N2Zz4=" class="img-fluid" alt="cell icon"></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="wrap-up" class="level2">
-<h2 class="anchored" data-anchor-id="wrap-up">Wrap-up</h2>
-<p>If every section above rendered as intended, this confirms the P0/P1 tables above end-to-end for a real Outline workspace.</p>
-</section>
 </section>
 
 </main>

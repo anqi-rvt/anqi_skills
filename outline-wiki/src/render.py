@@ -1,13 +1,13 @@
 """Render step: two independent outputs from the same `.qmd` source.
 
-`extract_gfm` is a thin pass-through for the Outline/GFM path — no Quarto
+`extract_gfm` is a thin pass-through for the Outline/GFM path: no Quarto
 invocation, so `` ```mermaid `` fences stay literal text for Outline's native
 renderer instead of being executed/rasterized by Quarto.
 
 `render_html` is the separate, Quarto-backed path for the standalone HTML
 export (P1 requirement) and for the mermaid/LaTeX compile check used by
-`validate.py`. It reuses the `render-md` skill's existing mermaid-fence
-staging rather than reimplementing it.
+`validate.py`. It reuses the vendored `render_md.py`'s existing
+mermaid-fence staging rather than reimplementing it.
 """
 
 from __future__ import annotations
@@ -59,7 +59,7 @@ def write_front_matter_field(qmd_path: Path, key: str, value: str) -> None:
 
 def extract_gfm(qmd_path: Path) -> tuple[str, str]:
     """Strip front matter, return `(title, body)`. Everything else in the
-    file — mermaid fences included — passes through unchanged."""
+    file (mermaid fences included) passes through unchanged."""
     path = Path(qmd_path)
     text = path.read_text(encoding="utf-8")
     match = _FRONT_MATTER.match(text)

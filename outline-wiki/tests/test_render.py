@@ -6,11 +6,11 @@ from render import extract_gfm, read_front_matter, write_front_matter_field
 def test_read_front_matter_parses_yaml_block(tmp_path):
     qmd = tmp_path / "doc.qmd"
     qmd.write_text(
-        "---\ntitle: Sample — Test Fixture\noutline_collection_id: abc-123\n---\n\n# Body\n",
+        "---\ntitle: Sample Test Fixture\noutline_collection_id: abc-123\n---\n\n# Body\n",
         encoding="utf-8",
     )
     fm = read_front_matter(qmd)
-    assert fm["title"] == "Sample — Test Fixture"
+    assert fm["title"] == "Sample Test Fixture"
     assert fm["outline_collection_id"] == "abc-123"
 
 

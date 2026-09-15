@@ -15,7 +15,7 @@ Front matter on `INPUT.qmd` carries the sync state:
   manual edits made directly in Outline since the last sync)
 
 Manual-edit reconciliation replaces the qmd's entire body with the live
-Outline content — a whole-file replace, not a merge. If the qmd was also
+Outline content: a whole-file replace, not a merge. If the qmd was also
 edited locally since the last sync, review the diff before trusting
 `--auto-commit`.
 """
@@ -24,7 +24,6 @@ from __future__ import annotations
 
 import argparse
 import difflib
-import json
 import re
 import subprocess
 import sys
@@ -41,6 +40,7 @@ from render import (  # noqa: E402
     render_html,
     write_front_matter_field,
 )
+from sync_metadata import SyncMetadata  # noqa: E402
 from validate import validate  # noqa: E402
 
 _ASSET_REF = re.compile(r"!?\[[^\]]*\]\(([^)]+)\)")
@@ -51,7 +51,7 @@ _SEPARATOR_CELL = re.compile(r"^:?-+:?$")
 def bot_reply_text(anchor_text: str) -> str:
     return (
         f"This thread was anchored to {anchor_text!r}. An automated sync of this "
-        "page's content has reset that anchor — please re-check it still applies "
+        "page's content has reset that anchor; please re-check it still applies "
         "to the intended text."
     )
 
@@ -98,7 +98,7 @@ def find_local_asset_refs(markdown: str, base_dir: Path) -> list[Path]:
     """Distinct local files referenced via `![alt](path)` that exist on
     disk within `base_dir`. Already-resolved Outline attachment URLs and
     remote URLs are skipped; a reference that escapes `base_dir` (`../`
-    traversal, or an absolute path) is rejected rather than uploaded —
+    traversal, or an absolute path) is rejected rather than uploaded:
     a malformed/malicious `.qmd` must not be able to exfiltrate an
     arbitrary local file as an Outline attachment."""
     base_dir = Path(base_dir).resolve()
@@ -124,14 +124,14 @@ def _git_commit(qmd_path: Path, message: str) -> None:
     except FileNotFoundError as exc:
         raise SystemExit(
             "error: --auto-commit needs git on PATH, but it wasn't found. "
-            f"{qmd_path} has already been patched with the reconciled content — "
+            f"{qmd_path} has already been patched with the reconciled content, "
             "commit it yourself."
         ) from exc
     except subprocess.CalledProcessError as exc:
         raise SystemExit(
             f"error: --auto-commit's `git {exc.cmd[1]}` failed (is {qmd_path.parent} "
             f"a git repository?). {qmd_path} has already been patched with the "
-            "reconciled content — commit it yourself."
+            "reconciled content, commit it yourself."
         ) from exc
 
 
@@ -145,8 +145,9 @@ def sync(
     base_dir = qmd_path.parent.resolve()
     # Derived from qmd_path, not manifest_path: the manifest may be shared
     # across multiple documents (hash-keyed dedup across renamed/moved
-    # files), but the sync cache/snapshots below are specific to this one.
-    cache_path = qmd_path.with_suffix(".last-synced.md")
+    # files), but the sync metadata below is specific to this one.
+    metadata_path = SyncMetadata.path_for(qmd_path)
+    metadata = SyncMetadata.load(metadata_path)
     manifest = Manifest.load(manifest_path)
 
     front_matter = read_front_matter(qmd_path)
@@ -163,16 +164,16 @@ def sync(
     # Step 5: reconcile manual edits (only possible once a document exists).
     if document_id and last_synced_at:
         live = client.get_document(document_id)
-        if live["updatedAt"] != last_synced_at:
-            cached = cache_path.read_text(encoding="utf-8") if cache_path.exists() else ""
-            if not texts_match(cached, live["text"]):
+        if live["updatedAt"] != last_synced_at and not texts_match(
+            metadata.last_synced_body, live["text"]
+        ):
                 _, current_body = extract_gfm(qmd_path)
                 if texts_match(current_body, live["text"]):
                     pass  # already matches (e.g. a prior run already reconciled this)
                 elif dry_run:
                     print(
                         f"[dry-run] {qmd_path} was edited manually in Outline since the "
-                        "last sync — a real run would patch it with the live content and "
+                        "last sync. A real run would patch it with the live content and "
                         "stop for review (or auto-commit with --auto-commit). No files "
                         "touched."
                     )
@@ -200,15 +201,18 @@ def sync(
                             f"error: page was edited manually in Outline since the "
                             f"last sync ({reason}).\n"
                             f"  {qmd_path} has been updated with the live content and left dirty.\n"
-                            "  Review the diff, commit it, and re-run the sync — "
+                            "  Review the diff, commit it, and re-run the sync, "
                             "or pass --auto-commit to do this automatically next time."
                         )
 
     title, body = extract_gfm(qmd_path)
 
     if dry_run:
-        cached = cache_path.read_text(encoding="utf-8") if cache_path.exists() else ""
-        diff = "\n".join(difflib.unified_diff(cached.splitlines(), body.splitlines(), lineterm=""))
+        diff = "\n".join(
+            difflib.unified_diff(
+                metadata.last_synced_body.splitlines(), body.splitlines(), lineterm=""
+            )
+        )
         print(f"[dry-run] title: {title}")
         print(f"[dry-run] local assets referenced: {len(find_local_asset_refs(body, base_dir))}")
         print("[dry-run] body diff vs. last sync:")
@@ -231,14 +235,13 @@ def sync(
 
     # Self-referencing heading links: the document's URL is already known
     # from creation above (or from front matter on a prior sync), so this
-    # is always a single pass — no need to push twice.
+    # is always a single pass. No need to push twice.
     page = client.get_document(document_id)
     body = rewrite_self_links(body, f"{client.base_url}{page['url']}")
 
     # Step 6: snapshot comments before overwriting.
     comments = client.list_comments(document_id, include_anchor_text=True)
-    comments_snapshot_path = qmd_path.with_suffix(".comments-snapshot.json")
-    comments_snapshot_path.write_text(json.dumps(comments, indent=2, default=str), encoding="utf-8")
+    metadata.comments_snapshot = comments
     anchored_threads = [
         (c["id"], c["anchorText"])
         for c in comments
@@ -247,14 +250,10 @@ def sync(
 
     # Step 7: snapshot the page's revision history before writing, so this
     # sync is rollback-able independent of git history.
-    revisions = client.list_revisions(document_id)
-    revisions_snapshot_path = qmd_path.with_suffix(".revisions-snapshot.json")
-    revisions_snapshot_path.write_text(
-        json.dumps(revisions, indent=2, default=str), encoding="utf-8"
-    )
+    metadata.revisions_snapshot = client.list_revisions(document_id)
 
     # Step 3 (standalone HTML export, P1 requirement): the validation gate
-    # in main() already confirmed this compiles — this call writes the
+    # in main() already confirmed this compiles. This call writes the
     # persistent output file, not a throwaway check.
     html_path = qmd_path.with_suffix(".html")
     render_html(qmd_path, html_path)
@@ -262,8 +261,8 @@ def sync(
     # Step 8: push.
     updated = client.update_document(document_id, text=body, title=title)
 
-    # Step 9: mandatory bot reply on every previously-anchored thread —
-    # anchor loss is unconditional on every resync, confirmed in design.md.
+    # Step 9: mandatory bot reply on every previously-anchored thread.
+    # Anchor loss is unconditional on every resync, confirmed in design.md.
     # anchorText was captured above, before this push detaches it, so the
     # reply can still say what the comment used to point at.
     for thread_id, anchor_text in anchored_threads:
@@ -271,7 +270,8 @@ def sync(
 
     # Step 10: record state for next sync's manual-edit check and manifest.
     write_front_matter_field(qmd_path, "outline_last_synced_at", updated["updatedAt"])
-    cache_path.write_text(body, encoding="utf-8")
+    metadata.last_synced_body = body
+    metadata.save(metadata_path)
     manifest.save(manifest_path)
 
     new_uploads = len(manifest.newly_uploaded)
@@ -282,7 +282,8 @@ def sync(
         "Local files: "
         f"qmd={qmd_path.resolve()} "
         f"html={html_path.resolve()} "
-        f"manifest={manifest_path.resolve()}"
+        f"manifest={manifest_path.resolve()} "
+        f"metadata={metadata_path.resolve()}"
     )
     print(f"Attachments: {new_uploads} uploaded, {reused_uploads} reused")
     reply_word = "reply" if len(anchored_threads) == 1 else "replies"
@@ -320,7 +321,7 @@ def main(argv: list[str] | None = None) -> int:
 
     if not opts.skip_validate and not validate(opts.input):
         print(
-            "error: validation failed — fix the issues above, or pass --skip-validate to "
+            "error: validation failed. Fix the issues above, or pass --skip-validate to "
             "sync anyway",
             file=sys.stderr,
         )

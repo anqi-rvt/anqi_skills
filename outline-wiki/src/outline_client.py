@@ -2,7 +2,7 @@
 
 Every method here mirrors a call validated live against the real Rivet
 workspace (see design.md for the confirmed request/response shapes). Not
-unit-tested directly — it's exercised through `sync.py --dry-run` and live
+unit-tested directly. It's exercised through `sync.py --dry-run` and live
 runs, the same way `render_md.py` (vendored from a sibling project) has no
 test file and is validated by running it.
 """
@@ -38,7 +38,7 @@ class OutlineClient:
         )
         self.api_key = api_key or os.environ["OUTLINE_API_KEY"]
         # Default to real TLS verification; only skip it on explicit
-        # opt-in (OUTLINE_INSECURE=1 — was needed against Rivet's internal
+        # opt-in (OUTLINE_INSECURE=1, was needed against Rivet's internal
         # CA during development), never silently.
         self.verify = verify if verify is not None else os.environ.get("OUTLINE_INSECURE") != "1"
         if not self.verify:
@@ -49,7 +49,7 @@ class OutlineClient:
     def _post(self, endpoint: str, payload: dict | None = None, **kwargs: Any) -> dict:
         # Gap: no rate-limit handling. Outline's general API limit is
         # documented around 1000 requests/minute/IP, tighter on specific
-        # expensive endpoints — relevant once a run uploads many
+        # expensive endpoints, relevant once a run uploads many
         # attachments. A 429 currently surfaces as a plain OutlineAPIError.
         # Suggested approach: catch status_code == 429 here, read the
         # `Retry-After` response header if present (else use a short fixed
