@@ -1,10 +1,10 @@
 """Thin wrapper over the Outline REST API endpoints this pipeline uses.
 
-Every method here mirrors a call proven live against the real Rivet
-workspace during design.md's empirical validation (see that file for the
-confirmed request/response shapes). Not unit-tested directly — it's
-exercised through `sync.py --dry-run` and live runs, the same way the
-`render-md` skill has no test file and is validated by running it.
+Every method here mirrors a call validated live against the real Rivet
+workspace (see design.md for the confirmed request/response shapes). Not
+unit-tested directly — it's exercised through `sync.py --dry-run` and live
+runs, the same way `render_md.py` (vendored from a sibling project) has no
+test file and is validated by running it.
 """
 
 from __future__ import annotations

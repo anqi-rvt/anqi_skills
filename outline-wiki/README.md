@@ -12,7 +12,7 @@ documented limitation; see `design.md`).
 
 | Variable | Required | Default | Notes |
 |---|---|---|---|
-| `OUTLINE_API_KEY` | yes | — | |
+| `OUTLINE_API_KEY` | yes | — | [Generate one](https://www.getoutline.com/developers#description/api-key) in Outline under Settings → API & Apps |
 | `OUTLINE_URL` | no | `https://outline.rvt` | |
 | `OUTLINE_INSECURE` | no | unset (verify on) | set `1` to skip TLS verification — internal CA only, never silent |
 

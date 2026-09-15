@@ -46,6 +46,17 @@ def test_resolve_uploads_once_for_new_file(tmp_path):
     assert len(client.calls) == 1
 
 
+def test_resolve_tracks_newly_uploaded_hash(tmp_path):
+    f = tmp_path / "a.png"
+    f.write_bytes(b"hello world")
+    client = FakeClient()
+    m = Manifest()
+
+    m.resolve(f, client, "doc-1")
+
+    assert m.newly_uploaded == {sha256_file(f)}
+
+
 def test_resolve_skips_upload_when_hash_known(tmp_path):
     f = tmp_path / "a.png"
     f.write_bytes(b"hello world")
@@ -57,6 +68,19 @@ def test_resolve_skips_upload_when_hash_known(tmp_path):
 
     assert url1 == url2
     assert len(client.calls) == 1  # not re-uploaded
+
+
+def test_resolve_does_not_track_reused_hash_as_newly_uploaded(tmp_path):
+    f = tmp_path / "a.png"
+    f.write_bytes(b"hello world")
+    client = FakeClient()
+    m = Manifest()
+    m.resolve(f, client, "doc-1")
+
+    m2 = Manifest(dict(m.entries))  # simulate a fresh process loading the saved manifest
+    m2.resolve(f, client, "doc-1")
+
+    assert m2.newly_uploaded == set()
 
 
 def test_resolve_reuploads_when_content_changes(tmp_path):

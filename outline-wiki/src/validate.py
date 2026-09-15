@@ -2,9 +2,9 @@
 
 Checks, each reported independently rather than stopping at the first
 failure: the mermaid/Quarto compile (via render.render_html — same error
-output render-md itself produces), balanced math delimiters, and URL
-syntax/reachability. Imported by sync.py, which runs this as a gate before
-every sync unless told otherwise — see sync.py --help.
+output the vendored render_md.py itself produces), balanced math
+delimiters, and URL syntax/reachability. Imported by sync.py, which runs
+this as a gate before every sync unless told otherwise — see sync.py --help.
 """
 
 from __future__ import annotations

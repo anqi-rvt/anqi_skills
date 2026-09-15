@@ -14,10 +14,10 @@ Front matter on `INPUT.qmd` carries the sync state:
 - `outline_last_synced_at` (written back after every push; used to detect
   manual edits made directly in Outline since the last sync)
 
-Known v1 simplification: manual-edit reconciliation replaces the qmd's
-entire body with the live Outline content rather than a fine-grained 3-way
-merge. If you've also edited the qmd locally since the last sync, review the
-diff carefully before trusting `--auto-commit`.
+Manual-edit reconciliation replaces the qmd's entire body with the live
+Outline content — a whole-file replace, not a merge. If the qmd was also
+edited locally since the last sync, review the diff before trusting
+`--auto-commit`.
 """
 
 from __future__ import annotations
@@ -223,7 +223,8 @@ def sync(
 
     # Steps 2-3: resolve + rewrite local asset references.
     url_map = {}
-    for asset_path in find_local_asset_refs(body, base_dir):
+    asset_paths = find_local_asset_refs(body, base_dir)
+    for asset_path in asset_paths:
         rel = str(asset_path.relative_to(base_dir)).replace("\\", "/")
         url_map[rel] = manifest.resolve(asset_path, client, document_id)
     body = rewrite_asset_links(body, url_map)
@@ -255,7 +256,8 @@ def sync(
     # Step 3 (standalone HTML export, P1 requirement): the validation gate
     # in main() already confirmed this compiles — this call writes the
     # persistent output file, not a throwaway check.
-    render_html(qmd_path, qmd_path.with_suffix(".html"))
+    html_path = qmd_path.with_suffix(".html")
+    render_html(qmd_path, html_path)
 
     # Step 8: push.
     updated = client.update_document(document_id, text=body, title=title)
@@ -272,9 +274,19 @@ def sync(
     cache_path.write_text(body, encoding="utf-8")
     manifest.save(manifest_path)
 
-    print(f"synced: {client.base_url}{updated['url']}")
-    if anchored_threads:
-        print(f"posted anchor-reset replies on {len(anchored_threads)} thread(s)")
+    new_uploads = len(manifest.newly_uploaded)
+    reused_uploads = len(asset_paths) - new_uploads
+
+    print(f"Page: {client.base_url}{updated['url']}")
+    print(
+        "Local files: "
+        f"qmd={qmd_path.resolve()} "
+        f"html={html_path.resolve()} "
+        f"manifest={manifest_path.resolve()}"
+    )
+    print(f"Attachments: {new_uploads} uploaded, {reused_uploads} reused")
+    reply_word = "reply" if len(anchored_threads) == 1 else "replies"
+    print(f"Comments: {len(anchored_threads)} anchor-reset {reply_word} posted")
     return 0
 
 
