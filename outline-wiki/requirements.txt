@@ -1,0 +1,6 @@
+requests>=2.32
+PyYAML>=6.0
+
+# only needed to run the test suite / lint, not to run sync.py or validate.py
+pytest>=8.0
+ruff>=0.6

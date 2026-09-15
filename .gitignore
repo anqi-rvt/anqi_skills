@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+
+# generated build output (regenerable via render.render_html / sync.py)
+*.html
+
+# per-sync state: point-in-time snapshots, not meant to be durable history
+# (the attachment manifest itself *is* tracked — see design.md)
+*.comments-snapshot.json
+*.last-synced.md
