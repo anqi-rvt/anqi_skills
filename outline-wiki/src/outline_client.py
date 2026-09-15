@@ -47,6 +47,14 @@ class OutlineClient:
         self.session.headers["Authorization"] = f"Bearer {self.api_key}"
 
     def _post(self, endpoint: str, payload: dict | None = None, **kwargs: Any) -> dict:
+        # Gap: no rate-limit handling. Outline's general API limit is
+        # documented around 1000 requests/minute/IP, tighter on specific
+        # expensive endpoints — relevant once a run uploads many
+        # attachments. A 429 currently surfaces as a plain OutlineAPIError.
+        # Suggested approach: catch status_code == 429 here, read the
+        # `Retry-After` response header if present (else use a short fixed
+        # backoff), sleep, and retry a bounded number of times before
+        # raising.
         r = self.session.post(
             f"{self.base_url}/api/{endpoint}",
             json=payload,

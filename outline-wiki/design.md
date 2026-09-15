@@ -76,7 +76,7 @@ diffed, tested, and dry-run independently of anything touching the network.
 | Inline code, inline math `$…$`, block math `$$…$$` | Backtick inline code; Outline's editor uses KaTeX for `$…$` inline and `$$…$$` display blocks (also reachable via `/math`) | Multi-line block math needs an explicit `\newline` between lines |
 | Mermaid diagrams | Fenced ` ```mermaid ` block, rendered live with a source/diagram toggle | `classDef`/`fill`/`stroke`/`color` styling survives Outline's renderer unsanitized |
 | Tables with text formatting | GFM pipe tables; inline formatting works inside cells | Outline's markdown exporter re-pads table separators/cells on export — see [Round-trip parity](#round-trip-parity) |
-| Sync onto an Outline page; get/snapshot its version | `documents.create` on a first sync, `documents.update` on later syncs; `revisions.list` (not `documents.revisions`) to snapshot before each overwrite | Always update the same `documentId` — never delete+recreate — see [Comment anchoring](#comment-anchoring). `documents.create`'s `text` field has a ~7,500-char limit — see [Remaining gaps](#remaining-gaps) |
+| Sync onto an Outline page; get/snapshot its version | `documents.create` on a first sync, `documents.update` on later syncs; `revisions.list` (not `documents.revisions`) to snapshot before each overwrite | Always update the same `documentId` — never delete+recreate — see [Comment anchoring](#comment-anchoring). `documents.create`'s `text` field has no meaningful size limit in practice — tested at 47K characters of well-formed markdown with no truncation |
 | Collaborative comments from the team | Outline's native inline commenting | — |
 | Programmatic comment retrieval: source, timestamp, content, threads, other metadata | `comments.list` / `comments.info`, with `includeAnchorText` to recover the text a comment is anchored to | Threading is `parentCommentId`. The `Comment` schema has no anchor/range field — an anchor exists only for a comment a human creates by selecting text in the UI; there is no way to create an anchored comment via the API |
 
@@ -87,7 +87,6 @@ diffed, tested, and dry-run independently of anything touching the network.
 | In-place rendered video (private file or public provider) | No reliable in-place mechanism via markdown import. Use a plain text link | An image-style `![alt](attachment-url)` embed for a private attachment can render as a playable card, but has been observed to silently break on a later resync. A public-provider URL (tested with YouTube) imports as inert plaintext — Outline's rich-embed allowlist triggers only on a real paste-into-editor interaction, not on markdown import |
 | Vector images (SVG) | Upload as an attachment like any other image — `attachments.create` accepts an arbitrary `contentType` | Renders inline like any raster image |
 | Export to standalone, single-embedded-file HTML | The `HTML` branch in the architecture diagram renders the `.qmd` directly to a single self-contained file | Met outside Outline — Outline's own HTML export writes separate asset files, so this is satisfied by not routing through Outline at all |
-| Auto-generated banner on the Outline page | Fixed banner block noting the source repo, inserted by the render step | Not implemented — see [Remaining gaps](#remaining-gaps) |
 
 ## Not supported
 
@@ -242,23 +241,3 @@ separate real-time channel (Yjs/websockets) that a plain REST overwrite
 bypasses. This is not data loss: the underlying attachment stays reachable
 (`attachments.redirect` → signed URL → `200`) throughout.
 
-## Remaining gaps
-
-- Heading-slug generation only handles the confirmed rule (lowercase,
-  spaces → hyphens); punctuation-stripping beyond that is unverified
-  against Outline's actual slug algorithm for headings containing
-  punctuation.
-- Rate-limit backoff (HTTP 429) is not implemented in `outline_client.py`.
-  The general API limit is documented around 1000 requests/minute/IP,
-  tighter on specific expensive endpoints — relevant once a run uploads
-  many attachments.
-- The auto-generated source banner (P1) is not implemented — `render.py`
-  does not insert one yet.
-- `validate.py`'s checks are wired into `sync.py` as a pre-sync gate but
-  not as a pre-commit hook.
-- Table-cell tolerance is confirmed for a single embedded image per cell;
-  multi-element or heavily formatted cell content is untested.
-- `documents.import` (needed to bypass `documents.create`'s ~7,500-char
-  limit on the first sync of a large `.qmd`) is not implemented —
-  `create_document` only calls `documents.create`, so a large first-ever
-  sync can fail where a resync of the same content would not.

@@ -8,7 +8,8 @@ documented limitation; see `design.md`).
 
 - Python 3.10+ (developed and tested on 3.12)
 - [Quarto](https://quarto.org) on `PATH` (bundles its own Pandoc)
-- `pip install -r requirements.txt`
+- `pip install -r requirements.txt` — add `-r requirements-dev.txt` too if
+  you'll run the tests or linter
 
 | Variable | Required | Default | Notes |
 |---|---|---|---|
@@ -64,7 +65,8 @@ SVG, video fallback, tables, self-referencing anchors) with no subject
 matter of its own — copy it as a starting point, or resync it as a smoke
 test. `sample.html` is its checked-in standalone export.
 `generate_sample_media.py` regenerates the placeholder assets (deps noted
-at the top of that script, not in `requirements.txt`).
+at the top of that script — not in `requirements.txt` or
+`requirements-dev.txt`, since nothing else needs them).
 
 ## Tests
 
