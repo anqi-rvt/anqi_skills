@@ -12,7 +12,7 @@ a real Outline workspace.
 **Before onboarding real reviewers:** every `documents.update` call
 unconditionally detaches the inline anchor of any human-created comment,
 even a no-op resync. `sync.py` mitigates this with an automated reply on
-each previously-anchored thread — see design.md's "Empirical tests"
+each previously-anchored thread — see design.md's "Comment anchoring"
 section before relying on this with real feedback.
 
 ## Reporting back
