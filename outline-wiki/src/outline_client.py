@@ -37,10 +37,10 @@ class OutlineClient:
             "/"
         )
         self.api_key = api_key or os.environ["OUTLINE_API_KEY"]
-        # Confirmed this session: verify=False was needed against Rivet's
-        # internal CA. Default to real verification; only skip it on
-        # explicit opt-in, never silently.
-        self.verify = os.environ.get("OUTLINE_INSECURE") == "1" if verify is None else verify
+        # Default to real TLS verification; only skip it on explicit
+        # opt-in (OUTLINE_INSECURE=1 — was needed against Rivet's internal
+        # CA during development), never silently.
+        self.verify = verify if verify is not None else os.environ.get("OUTLINE_INSECURE") != "1"
         if not self.verify:
             requests.packages.urllib3.disable_warnings()
         self.session = requests.Session()

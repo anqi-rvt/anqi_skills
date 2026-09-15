@@ -25,10 +25,17 @@ import subprocess
 import sys
 from pathlib import Path
 
-from anchors import rewrite_self_links
-from manifest import Manifest
-from outline_client import OutlineClient
-from render import extract_gfm, read_front_matter, render_html, write_front_matter_field
+sys.path.insert(0, str(Path(__file__).parent / "src"))
+
+from anchors import rewrite_self_links  # noqa: E402
+from manifest import Manifest  # noqa: E402
+from outline_client import OutlineClient  # noqa: E402
+from render import (  # noqa: E402
+    extract_gfm,
+    read_front_matter,
+    render_html,
+    write_front_matter_field,
+)
 
 _ASSET_REF = re.compile(r"!?\[[^\]]*\]\(([^)]+)\)")
 _TABLE_ROW = re.compile(r"^\s*\|.*\|\s*$")
@@ -83,14 +90,19 @@ def rewrite_asset_links(markdown: str, url_map: dict[str, str]) -> str:
 
 def find_local_asset_refs(markdown: str, base_dir: Path) -> list[Path]:
     """Distinct local files referenced via `![alt](path)` that exist on
-    disk relative to `base_dir`. Already-resolved Outline attachment URLs
-    and remote URLs are skipped."""
-    base_dir = Path(base_dir)
+    disk within `base_dir`. Already-resolved Outline attachment URLs and
+    remote URLs are skipped; a reference that escapes `base_dir` (`../`
+    traversal, or an absolute path) is rejected rather than uploaded —
+    a malformed/malicious `.qmd` must not be able to exfiltrate an
+    arbitrary local file as an Outline attachment."""
+    base_dir = Path(base_dir).resolve()
     found: list[Path] = []
     for ref in _ASSET_REF.findall(markdown):
         if ref.startswith(("http://", "https://", "/api/")):
             continue
-        candidate = base_dir / ref
+        candidate = (base_dir / ref).resolve()
+        if not candidate.is_relative_to(base_dir):
+            continue
         if candidate.exists() and candidate not in found:
             found.append(candidate)
     return found
@@ -100,16 +112,35 @@ def find_local_asset_refs(markdown: str, base_dir: Path) -> list[Path]:
 
 
 def _git_commit(qmd_path: Path, message: str) -> None:
-    subprocess.run(["git", "add", str(qmd_path)], check=True, cwd=qmd_path.parent)
-    subprocess.run(["git", "commit", "-m", message], check=True, cwd=qmd_path.parent)
+    try:
+        subprocess.run(["git", "add", str(qmd_path)], check=True, cwd=qmd_path.parent)
+        subprocess.run(["git", "commit", "-m", message], check=True, cwd=qmd_path.parent)
+    except FileNotFoundError as exc:
+        raise SystemExit(
+            "error: --auto-commit needs git on PATH, but it wasn't found. "
+            f"{qmd_path} has already been patched with the reconciled content — "
+            "commit it yourself."
+        ) from exc
+    except subprocess.CalledProcessError as exc:
+        raise SystemExit(
+            f"error: --auto-commit's `git {exc.cmd[1]}` failed (is {qmd_path.parent} "
+            f"a git repository?). {qmd_path} has already been patched with the "
+            "reconciled content — commit it yourself."
+        ) from exc
 
 
 def sync(
     qmd_path: Path, manifest_path: Path, auto_commit: bool = False, dry_run: bool = False
 ) -> int:
     qmd_path = Path(qmd_path)
-    base_dir = qmd_path.parent
-    cache_path = manifest_path.with_suffix(".last-synced.md")
+    # Resolved: find_local_asset_refs returns resolved paths (for the
+    # traversal check), and relative_to() below needs both sides resolved
+    # consistently.
+    base_dir = qmd_path.parent.resolve()
+    # Derived from qmd_path, not manifest_path: the manifest may be shared
+    # across multiple documents (hash-keyed dedup across renamed/moved
+    # files), but the sync cache/snapshots below are specific to this one.
+    cache_path = qmd_path.with_suffix(".last-synced.md")
     manifest = Manifest.load(manifest_path)
 
     front_matter = read_front_matter(qmd_path)
@@ -132,6 +163,14 @@ def sync(
                 _, current_body = extract_gfm(qmd_path)
                 if texts_match(current_body, live["text"]):
                     pass  # already matches (e.g. a prior run already reconciled this)
+                elif dry_run:
+                    print(
+                        f"[dry-run] {qmd_path} was edited manually in Outline since the "
+                        "last sync — a real run would patch it with the live content and "
+                        "stop for review (or auto-commit with --auto-commit). No files "
+                        "touched."
+                    )
+                    return 0
                 else:
                     text = qmd_path.read_text(encoding="utf-8")
                     fm_match = re.match(r"^---\n.*?\n---\n\n?", text, re.DOTALL)
@@ -191,17 +230,21 @@ def sync(
 
     # Step 6: snapshot comments before overwriting.
     comments = client.list_comments(document_id, include_anchor_text=True)
-    snapshot_path = manifest_path.with_suffix(".comments-snapshot.json")
-    snapshot_path.write_text(json.dumps(comments, indent=2, default=str), encoding="utf-8")
+    comments_snapshot_path = qmd_path.with_suffix(".comments-snapshot.json")
+    comments_snapshot_path.write_text(json.dumps(comments, indent=2, default=str), encoding="utf-8")
     anchored_threads = [
         (c["id"], c["anchorText"])
         for c in comments
         if c.get("parentCommentId") is None and c.get("anchorText")
     ]
 
-    # Step 7: snapshot revision (Outline versions on every update; this just
-    # confirms one exists before we write).
-    client.list_revisions(document_id)
+    # Step 7: snapshot the page's revision history before writing, so this
+    # sync is rollback-able independent of git history.
+    revisions = client.list_revisions(document_id)
+    revisions_snapshot_path = qmd_path.with_suffix(".revisions-snapshot.json")
+    revisions_snapshot_path.write_text(
+        json.dumps(revisions, indent=2, default=str), encoding="utf-8"
+    )
 
     # Step 3 (HTML export / validation gate): render standalone HTML too.
     render_html(qmd_path, qmd_path.with_suffix(".html"))

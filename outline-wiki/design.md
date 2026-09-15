@@ -212,8 +212,9 @@ later decision.
 ## Empirical tests
 
 All P0/P1 mechanisms and the "Not supported" list above were validated
-against the real Rivet Outline workspace (`Core SW > Perception > GDC`, a
-test fixture exercising every requirement) rather than assumed from
+against the real Rivet Outline workspace (`Core SW > Misc > "Outline Wiki
+Test Page"`, backed by `example/sample.qmd`, a fixture with no subject
+matter of its own exercising every requirement) rather than assumed from
 documentation. Confirmed field names, pulled from live responses rather than
 the OpenAPI spec: `Comment` — `id`, `data` (ProseMirror JSON body,
 which can itself embed rich content like images), `documentId`,

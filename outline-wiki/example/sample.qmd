@@ -3,16 +3,15 @@ title: "Outline Wiki Test Page"
 outline_collection_id: cf8538c3-33a1-4bd2-b754-382a992321f4
 outline_parent_id: 24e6dc9d-6252-488b-b898-8e4bc90a4635
 outline_id: 6bea3fc9-d3ac-474c-adbe-986416c99b5c
-outline_last_synced_at: '2026-09-15T01:33:02.553Z'
+outline_last_synced_at: '2026-09-15T16:39:53.368Z'
 ---
 
 # Outline Wiki Test Page
 
 This page is a **test fixture**: every section below exercises one of the
 requirements in the tables underneath, so a resync of this file confirms
-the whole pipeline still works end-to-end. "GDC" (geometric display
-calibration) is used below only as a plausible subject for the sample
-content, not real calibration data.
+the whole pipeline still works end-to-end. It has no subject matter of its
+own — every name, image, and value below is a generic placeholder.
 
 ### P0 requirements (critical, mandatory)
 
@@ -47,7 +46,7 @@ a same-page click).
 
 ## Inline code and math
 
-Inline code: `calibration_offset_mm`. Inline math: $E = mc^2$. Block math:
+Inline code: `sample_variable`. Inline math: $E = mc^2$. Block math:
 
 $$
 \int_0^\infty e^{-x^2}\,dx = \frac{\sqrt{\pi}}{2}
@@ -69,36 +68,36 @@ flowchart LR
     classDef decision fill:#5a2d4a,stroke:#331829,color:#ffffff
     classDef external fill:#2d4a2d,stroke:#1a2b1a,color:#ffffff
 
-    Camera["Camera frame<br/>capture"]:::external
-    Detect["Detect calibration<br/>target"]:::process
-    Solve{"Solve<br/>converged?"}:::decision
-    Params[("Calibration<br/>parameters")]:::artifact
+    Start["Start"]:::external
+    Step["Process<br/>step"]:::process
+    Check{"Check<br/>passed?"}:::decision
+    Result[("Result")]:::artifact
 
-    Camera --> Detect --> Solve
-    Solve -- "no" --> Detect
-    Solve -- "yes" --> Params
+    Start --> Step --> Check
+    Check -- "no" --> Step
+    Check -- "yes" --> Result
 ```
 
 ## Images
 
 A static image:
 
-![Calibration target](assets/gdc_target.png)
+![Sample image](assets/sample_image.png)
 
 An animated GIF (changing color + text):
 
-![Calibration animation](assets/gdc_calibration.gif)
+![Sample animation](assets/sample_animation.gif)
 
 A vector image (P1):
 
-![Calibration icon](assets/gdc_icon.svg)
+![Sample icon](assets/sample_icon.svg)
 
 ## Video
 
 A locally-hosted MP4 (P1) — image-style embed proved unreliable across
 resyncs (worked once, then silently broke). Use a plain text link instead:
 
-[Download: calibration video (MP4)](assets/gdc_calibration.mp4)
+[Download: sample video (MP4)](assets/sample_video.mp4)
 
 A public provider URL — confirmed this renders as inert plaintext via
 markdown import, not an embed (Outline's rich-embed allowlist only
@@ -108,18 +107,18 @@ https://www.youtube.com/watch?v=dQw4w9WgXcQ
 
 ## Tables
 
-| Axis | Offset (mm) | Status |
+| Row | Value | Status |
 |---|---|---|
-| **X** | 0.12 | ✅ *pass* |
-| **Y** | -0.08 | ✅ *pass* |
-| **Z** | 1.4 | ⚠️ **recheck** |
+| **A** | 0.12 | ✅ *pass* |
+| **B** | -0.08 | ✅ *pass* |
+| **C** | 1.4 | ⚠️ **recheck** |
 
 ## Table cell image tolerance
 
 | Label | Preview |
 |---|---|
-| Target | ![cell image](assets/gdc_target.png) |
-| Icon | ![cell icon](assets/gdc_icon.svg) |
+| Image | ![cell image](assets/sample_image.png) |
+| Icon | ![cell icon](assets/sample_icon.svg) |
 
 ## Wrap-up
 

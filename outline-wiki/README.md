@@ -13,6 +13,9 @@ empirical findings against a real Outline workspace live in `design.md`.
   its own Pandoc; no Node or extra Python packages needed.
 - An Outline API key in the `OUTLINE_API_KEY` environment variable, and
   optionally `OUTLINE_URL` (defaults to `https://outline.rvt`).
+- TLS certificate verification is on by default. If your Outline instance
+  sits behind an internal CA your machine doesn't trust, set
+  `OUTLINE_INSECURE=1` explicitly — never silent, opt-in only.
 
 Install the Python dependencies into whatever environment you use — a venv
 isn't required, just recommended:
@@ -53,9 +56,14 @@ front matter after the first successful sync — don't set them by hand.
 | `--dry-run` | Print what would change; no attachment upload, no document write, no comment post. |
 | `--auto-commit` | If Outline was edited manually since the last sync, commit the reconciliation patch instead of leaving it dirty for review. |
 
-`example/test.qmd` is a working fixture exercising every requirement
+`example/sample.qmd` is a working fixture exercising every requirement
 (math, mermaid, images/GIF/SVG, video fallback, tables, self-referencing
-anchors) — a good starting point to copy from, or to resync as a smoke test.
+anchors), with no subject matter of its own — a good starting point to copy
+from, or to resync as a smoke test. `example/sample.html` is its checked-in
+standalone HTML export. `example/generate_sample_media.py` regenerates the
+placeholder image/GIF/MP4/SVG assets (needs `pillow`, `imageio`,
+`imageio-ffmpeg` — not in `requirements.txt`, since nothing else in this
+repo needs them).
 
 ## Tests
 
@@ -66,7 +74,15 @@ ruff check .
 
 Unit tests cover the deterministic logic (attachment hashing/dedup, anchor
 slugs, front-matter handling, table-parity normalization, asset-link
-rewriting) with no network calls. `outline_client.py` and `sync.py`'s
-orchestration are exercised live instead — via `--dry-run` and real runs —
-the same way `render_md.py` (vendored here from the `render-md` skill) has
-no test file and is validated by running it.
+rewriting, path-traversal rejection) with no network calls. `sync.py`'s
+orchestration is exercised live instead — via `--dry-run` and real runs —
+the same way `src/render_md.py` (vendored from a sibling project) has no
+test file and is validated by running it.
+
+## Layout
+
+`sync.py` and `validate.py` are the only top-level scripts; everything they
+import lives in `src/` (`outline_client.py`, `manifest.py`, `anchors.py`,
+`render.py`, the vendored `render_md.py`). Tests stay in `tests/` and import
+those modules directly (no package install needed — pytest's `pythonpath`
+config in `pyproject.toml` handles it).

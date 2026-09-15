@@ -1,4 +1,9 @@
-"""Generate placeholder media (PNG, GIF, MP4, SVG) for the GDC Outline sync test."""
+"""Generate placeholder media (PNG, GIF, MP4, SVG) for the outline-wiki
+sample fixture (example/sample.qmd).
+
+Deps (not in requirements.txt — only this script needs them):
+    pip install pillow imageio imageio-ffmpeg
+"""
 
 import colorsys
 import pathlib
@@ -20,7 +25,7 @@ def frame(i: int, n: int) -> Image.Image:
         font = ImageFont.truetype("arial.ttf", 28)
     except OSError:
         font = ImageFont.load_default()
-    text = f"GDC calibration\nframe {i + 1}/{n}"
+    text = f"sample frame\n{i + 1}/{n}"
     draw.multiline_text((W / 2, H / 2), text, fill="white", font=font, anchor="mm", align="center")
     return img
 
@@ -29,19 +34,19 @@ def main() -> None:
     frames = [frame(i, N_FRAMES) for i in range(N_FRAMES)]
 
     frames[0].save(
-        OUT / "gdc_calibration.gif",
+        OUT / "sample_animation.gif",
         save_all=True,
         append_images=frames[1:],
         duration=120,
         loop=0,
     )
-    print("wrote", OUT / "gdc_calibration.gif")
+    print("wrote", OUT / "sample_animation.gif")
 
-    imageio.mimsave(OUT / "gdc_calibration.mp4", [f.convert("RGB") for f in frames], fps=8)
-    print("wrote", OUT / "gdc_calibration.mp4")
+    imageio.mimsave(OUT / "sample_video.mp4", [f.convert("RGB") for f in frames], fps=8)
+    print("wrote", OUT / "sample_video.mp4")
 
-    frames[0].save(OUT / "gdc_target.png")
-    print("wrote", OUT / "gdc_target.png")
+    frames[0].save(OUT / "sample_image.png")
+    print("wrote", OUT / "sample_image.png")
 
     svg = """<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120"
      viewBox="0 0 120 120">
@@ -50,8 +55,8 @@ def main() -> None:
   <line x1="10" y1="60" x2="110" y2="60" stroke="#5a2d4a" stroke-width="2"/>
   <circle cx="60" cy="60" r="6" fill="#4a3c1e"/>
 </svg>"""
-    (OUT / "gdc_icon.svg").write_text(svg)
-    print("wrote", OUT / "gdc_icon.svg")
+    (OUT / "sample_icon.svg").write_text(svg)
+    print("wrote", OUT / "sample_icon.svg")
 
 
 if __name__ == "__main__":

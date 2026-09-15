@@ -9,4 +9,4 @@ select = ["E", "F", "I", "UP", "B", "SIM"]
 known-first-party = ["outline_client", "manifest", "anchors", "render", "sync", "validate"]
 
 [tool.pytest.ini_options]
-pythonpath = ["."]
+pythonpath = [".", "src"]

@@ -19,7 +19,9 @@ from pathlib import Path
 
 import requests
 
-from render import extract_gfm, render_html
+sys.path.insert(0, str(Path(__file__).parent / "src"))
+
+from render import extract_gfm, render_html  # noqa: E402
 
 _LINK = re.compile(r"(?<!!)\[[^\]]*\]\(([^)]+)\)")
 _INLINE_MATH = re.compile(r"(?<!\$)\$(?!\$)([^$\n]*)\$(?!\$)")

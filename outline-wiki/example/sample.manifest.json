@@ -1,0 +1,22 @@
+{
+  "49841d3d9c5a6acae2d152d6f22c9c1ea55e76822ffb4cd7544b2bfb23287055": {
+    "source_path": "C:/Users/AnqiXu/workspace/anqi_skills/outline-wiki/example/assets/sample_icon.svg",
+    "uploaded_at": "2026-09-15T16:39:48.491030+00:00",
+    "url": "/api/attachments.redirect?id=b4b5c79a-7a56-4444-bc47-83aa82f994b8"
+  },
+  "95c07a23f66a421fae3b10a66673b296dcccc893c70619bef4bd41830b78ade3": {
+    "source_path": "C:/Users/AnqiXu/workspace/anqi_skills/outline-wiki/example/assets/sample_animation.gif",
+    "uploaded_at": "2026-09-15T16:39:48.361733+00:00",
+    "url": "/api/attachments.redirect?id=c5a452bf-eb5a-429e-8520-b53da5257126"
+  },
+  "9d4490a1155dd98ce637d1ff620083e0d684ab5d7375179ae648bd7a93cfa601": {
+    "source_path": "C:/Users/AnqiXu/workspace/anqi_skills/outline-wiki/example/assets/sample_image.png",
+    "uploaded_at": "2026-09-15T16:39:48.172949+00:00",
+    "url": "/api/attachments.redirect?id=f6f6cc07-44ef-40d6-9be9-1e808b28ae41"
+  },
+  "a0aba5b84084b9db504847fed47804d269963f3e5262c521a03371454fda9bbb": {
+    "source_path": "C:/Users/AnqiXu/workspace/anqi_skills/outline-wiki/example/assets/sample_video.mp4",
+    "uploaded_at": "2026-09-15T16:39:48.614366+00:00",
+    "url": "/api/attachments.redirect?id=0cc4b61a-d004-4284-a970-69679d39a3ce"
+  }
+}

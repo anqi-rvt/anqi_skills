@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import json
 
+import pytest
+
 from manifest import Manifest, sha256_file
 
 
@@ -120,5 +122,37 @@ def test_saved_file_is_readable_json(tmp_path):
     digest = sha256_file(f)
     assert digest in data
     assert data[digest]["url"] == "/api/attachments.redirect?id=fake-1"
-    assert data[digest]["source_path"] == str(f)
+    assert data[digest]["source_path"] == str(f).replace("\\", "/")
     assert "uploaded_at" in data[digest]
+
+
+def test_save_does_not_corrupt_existing_file_on_failure(tmp_path, monkeypatch):
+    manifest_path = tmp_path / "manifest.json"
+    manifest_path.write_text('{"already": "here"}', encoding="utf-8")
+
+    m = Manifest({"new": {"url": "x"}})
+
+    def boom(*a, **k):
+        raise OSError("simulated write failure")
+
+    monkeypatch.setattr("manifest.json.dump", boom)
+    with pytest.raises(OSError):
+        m.save(manifest_path)
+
+    # save() must write to a temp file and swap it in atomically, so a
+    # failure partway through must never truncate/corrupt the existing file.
+    with open(manifest_path, encoding="utf-8") as fh:
+        assert json.load(fh) == {"already": "here"}
+    # no leftover temp file
+    assert list(tmp_path.glob("manifest.json.*.tmp")) == []
+
+
+def test_save_leaves_no_temp_file_on_success(tmp_path):
+    f = tmp_path / "a.png"
+    f.write_bytes(b"hello world")
+    m = Manifest()
+    m.resolve(f, FakeClient(), "doc-1")
+    manifest_path = tmp_path / "manifest.json"
+    m.save(manifest_path)
+
+    assert {p.name for p in tmp_path.iterdir()} == {"a.png", "manifest.json"}

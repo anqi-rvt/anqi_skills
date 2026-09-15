@@ -9,10 +9,12 @@ Publish a `.qmd` to Outline and keep it in sync — `sync.py` does the push;
 `validate.py` checks the source compiles cleanly first. Full design,
 requirements, and empirical findings live in `design.md`.
 
-`example/test.qmd` exercises every P0/P1 requirement (math, mermaid,
-images/GIF/SVG, video fallback, tables, self-referencing anchors) and is
-kept synced to a real page (Core SW > Misc > "Outline Wiki Test Page") —
-resync it after any change to `sync.py` as a smoke test.
+`example/sample.qmd` exercises every P0/P1 requirement (math, mermaid,
+images/GIF/SVG, video fallback, tables, self-referencing anchors), with no
+subject matter of its own, and is kept synced to a real page (Core SW >
+Misc > "Outline Wiki Test Page") — resync it after any change to `sync.py`
+as a smoke test. `sync.py`/`validate.py` are the only top-level scripts;
+everything else lives in `src/`.
 
 ## Run it
 
@@ -28,7 +30,10 @@ resync it after any change to `sync.py` as a smoke test.
 ```
 
 `OUTLINE_API_KEY` must be set (a permanent env var, not a temporary export —
-see design.md's Sync script section). `INPUT.qmd` needs front matter:
+see design.md's Sync script section). TLS verification is on by default;
+set `OUTLINE_INSECURE=1` explicitly if the target instance sits behind an
+internal CA your machine doesn't trust — never assume this is needed.
+`INPUT.qmd` needs front matter:
 
 ```yaml
 ---

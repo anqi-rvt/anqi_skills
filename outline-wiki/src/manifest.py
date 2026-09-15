@@ -11,6 +11,8 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
+import uuid
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Protocol
@@ -40,8 +42,17 @@ class Manifest:
             return cls(json.load(f))
 
     def save(self, path: Path) -> None:
-        with open(path, "w", encoding="utf-8") as f:
-            json.dump(self.entries, f, indent=2, sort_keys=True)
+        """Write atomically: a crash/interrupt mid-write must never leave
+        `path` truncated or corrupted, since that would silently lose the
+        dedup history (next run just re-uploads everything)."""
+        path = Path(path)
+        tmp_path = path.with_name(f"{path.name}.{uuid.uuid4().hex}.tmp")
+        try:
+            with open(tmp_path, "w", encoding="utf-8") as f:
+                json.dump(self.entries, f, indent=2, sort_keys=True)
+            os.replace(tmp_path, path)
+        finally:
+            tmp_path.unlink(missing_ok=True)
 
     def resolve(self, file_path: Path, client: AttachmentUploader, document_id: str) -> str:
         """Return the Outline attachment URL for `file_path`, uploading only
@@ -53,7 +64,9 @@ class Manifest:
         url = client.upload_attachment(file_path, document_id)
         self.entries[digest] = {
             "url": url,
-            "source_path": str(file_path),
+            # forward slashes on every OS: keeps the committed manifest
+            # diff-stable across Windows/Mac/Linux contributors
+            "source_path": str(file_path).replace("\\", "/"),
             "uploaded_at": datetime.now(UTC).isoformat(),
         }
         return url

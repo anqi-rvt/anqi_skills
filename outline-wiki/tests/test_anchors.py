@@ -15,11 +15,22 @@ def test_slugify_collapses_repeated_whitespace():
     assert slugify("Inline  code   and math") == "h-inline-code-and-math"
 
 
+def test_slugify_collapses_hyphens_left_by_stripped_punctuation():
+    # "Q & A" -> "q-&-a" after whitespace->hyphen, then "&" is stripped as
+    # non-alphanumeric, which must not leave a doubled hyphen behind.
+    assert slugify("Q & A") == "h-q-a"
+
+
+def test_slugify_strips_leading_and_trailing_hyphens():
+    assert slugify("- Leading and trailing -") == "h-leading-and-trailing"
+
+
 def test_rewrite_self_links_bare_fragment():
     md = "See the [Tables section](#tables) for details."
-    out = rewrite_self_links(md, "https://outline.rvt/doc/gdc-abc123")
+    out = rewrite_self_links(md, "https://outline.rvt/doc/sample-abc123")
     assert (
-        out == "See the [Tables section](https://outline.rvt/doc/gdc-abc123#h-tables) for details."
+        out
+        == "See the [Tables section](https://outline.rvt/doc/sample-abc123#h-tables) for details."
     )
 
 

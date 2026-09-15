@@ -18,7 +18,8 @@ def _normalize(text: str) -> str:
     text = text.strip().lower()
     text = re.sub(r"\s+", "-", text)
     text = re.sub(r"[^a-z0-9-]", "", text)
-    return text
+    text = re.sub(r"-{2,}", "-", text)  # stripped punctuation can leave doubled hyphens
+    return text.strip("-")
 
 
 def slugify(heading_text: str) -> str:
