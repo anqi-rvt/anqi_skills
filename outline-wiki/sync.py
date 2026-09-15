@@ -1,6 +1,11 @@
 """Sync a `.qmd` source onto an Outline page. See design.md "Sync script".
 
     python sync.py INPUT.qmd [--manifest PATH] [--auto-commit] [--dry-run]
+                              [--skip-validate | --validate-only]
+
+Runs validate.py's checks (mermaid/Quarto compile, math delimiters, URLs)
+as a gate before every sync, unless --skip-validate is passed. Pass
+--validate-only to run just that gate and exit, without syncing.
 
 Front matter on `INPUT.qmd` carries the sync state:
 - `outline_collection_id` (required on first sync)
@@ -36,6 +41,7 @@ from render import (  # noqa: E402
     render_html,
     write_front_matter_field,
 )
+from validate import validate  # noqa: E402
 
 _ASSET_REF = re.compile(r"!?\[[^\]]*\]\(([^)]+)\)")
 _TABLE_ROW = re.compile(r"^\s*\|.*\|\s*$")
@@ -246,7 +252,9 @@ def sync(
         json.dumps(revisions, indent=2, default=str), encoding="utf-8"
     )
 
-    # Step 3 (HTML export / validation gate): render standalone HTML too.
+    # Step 3 (standalone HTML export, P1 requirement): the validation gate
+    # in main() already confirmed this compiles — this call writes the
+    # persistent output file, not a throwaway check.
     render_html(qmd_path, qmd_path.with_suffix(".html"))
 
     # Step 8: push.
@@ -283,12 +291,30 @@ def main(argv: list[str] | None = None) -> int:
         "--auto-commit", action="store_true", help="auto-commit manual-edit reconciliation patches"
     )
     p.add_argument("--dry-run", action="store_true", help="print what would change; no write calls")
+    validate_group = p.add_mutually_exclusive_group()
+    validate_group.add_argument(
+        "--skip-validate", action="store_true", help="skip the pre-sync validation gate"
+    )
+    validate_group.add_argument(
+        "--validate-only", action="store_true", help="run the validation gate only; do not sync"
+    )
     opts = p.parse_args(argv)
 
     if not opts.input.exists():
         p.error(f"input not found: {opts.input}")
-    manifest_path = opts.manifest or opts.input.with_suffix(".manifest.json")
 
+    if opts.validate_only:
+        return 0 if validate(opts.input) else 1
+
+    if not opts.skip_validate and not validate(opts.input):
+        print(
+            "error: validation failed — fix the issues above, or pass --skip-validate to "
+            "sync anyway",
+            file=sys.stderr,
+        )
+        return 1
+
+    manifest_path = opts.manifest or opts.input.with_suffix(".manifest.json")
     return sync(opts.input, manifest_path, auto_commit=opts.auto_commit, dry_run=opts.dry_run)
 
 

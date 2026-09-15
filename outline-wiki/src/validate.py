@@ -1,27 +1,21 @@
 """Local validation for a `.qmd` before it ever touches Outline.
 
-    python validate.py INPUT.qmd
-
 Checks, each reported independently rather than stopping at the first
 failure: the mermaid/Quarto compile (via render.render_html — same error
 output render-md itself produces), balanced math delimiters, and URL
-syntax/reachability. Standalone for now; whether this becomes a pre-commit
-hook or a pre-sync gate is a later decision (see design.md).
+syntax/reachability. Imported by sync.py, which runs this as a gate before
+every sync unless told otherwise — see sync.py --help.
 """
 
 from __future__ import annotations
 
-import argparse
 import re
-import sys
 import tempfile
 from pathlib import Path
 
 import requests
 
-sys.path.insert(0, str(Path(__file__).parent / "src"))
-
-from render import extract_gfm, render_html  # noqa: E402
+from render import extract_gfm, render_html
 
 _LINK = re.compile(r"(?<!!)\[[^\]]*\]\(([^)]+)\)")
 _INLINE_MATH = re.compile(r"(?<!\$)\$(?!\$)([^$\n]*)\$(?!\$)")
@@ -79,18 +73,3 @@ def validate(qmd_path: Path) -> bool:
         print(f"[{status}] {name}: {message}")
         all_ok = all_ok and ok
     return all_ok
-
-
-def main(argv: list[str] | None = None) -> int:
-    p = argparse.ArgumentParser(prog="validate.py", description=__doc__.splitlines()[0])
-    p.add_argument("input", type=Path, help="source .qmd file")
-    opts = p.parse_args(argv)
-
-    if not opts.input.exists():
-        p.error(f"input not found: {opts.input}")
-
-    return 0 if validate(opts.input) else 1
-
-
-if __name__ == "__main__":
-    sys.exit(main())

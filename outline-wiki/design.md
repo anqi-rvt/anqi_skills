@@ -201,13 +201,15 @@ collection-restricted scope. Least-privilege here means using a dedicated
 service-account user with the narrowest role Outline allows, not a scope
 flag on the key itself.
 
-## Local validation script
+## Local validation
 
-Separate from the sync script: a script that validates the `.qmd` → HTML
-compile before anything touches Outline — mermaid diagrams render without
-error, URLs resolve, LaTeX/math compiles. It stays standalone for now;
-whether it later becomes a pre-commit hook, a pre-sync gate, or both is a
-later decision.
+Validates the `.qmd` before anything touches Outline — mermaid/Quarto
+compile, math delimiters balance, URLs resolve. Lives in `src/validate.py`
+as a library module; `sync.py` is the only CLI entrypoint and runs this
+validation as a gate by default before every sync (`--skip-validate` to
+bypass it, `--validate-only` to run just the gate without syncing). Not
+wired as a pre-commit hook — that's still a later decision if it turns out
+to be worth the friction.
 
 ## Empirical tests
 

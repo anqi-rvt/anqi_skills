@@ -5,28 +5,29 @@ description: Sync a .qmd source onto an Outline wiki page (git stays the source 
 
 # outline-wiki
 
-Publish a `.qmd` to Outline and keep it in sync — `sync.py` does the push;
-`validate.py` checks the source compiles cleanly first. Full design,
-requirements, and empirical findings live in `design.md`.
+Publish a `.qmd` to Outline and keep it in sync — `sync.py` validates the
+source (mermaid/Quarto compile, math delimiters, URLs) then pushes it, all
+in one entrypoint. Full design, requirements, and empirical findings live
+in `design.md`.
 
 `example/sample.qmd` exercises every P0/P1 requirement (math, mermaid,
 images/GIF/SVG, video fallback, tables, self-referencing anchors), with no
 subject matter of its own, and is kept synced to a real page (Core SW >
 Misc > "Outline Wiki Test Page") — resync it after any change to `sync.py`
-as a smoke test. `sync.py`/`validate.py` are the only top-level scripts;
-everything else lives in `src/`.
+as a smoke test. `sync.py` is the only top-level script; everything else
+(including `validate.py`) lives in `src/`.
 
 ## Run it
 
 ```bash
-# validate first
-~/venv/local/Scripts/python.exe ~/.claude/skills/outline-wiki/validate.py INPUT.qmd
+# validates, then syncs
+~/venv/local/Scripts/python.exe ~/.claude/skills/outline-wiki/sync.py INPUT.qmd
 
-# see what would change, no writes
+# preview only, no writes
 ~/venv/local/Scripts/python.exe ~/.claude/skills/outline-wiki/sync.py INPUT.qmd --dry-run
 
-# sync for real
-~/venv/local/Scripts/python.exe ~/.claude/skills/outline-wiki/sync.py INPUT.qmd
+# validation only, no sync
+~/venv/local/Scripts/python.exe ~/.claude/skills/outline-wiki/sync.py INPUT.qmd --validate-only
 ```
 
 `OUTLINE_API_KEY` must be set (a permanent env var, not a temporary export —
@@ -52,6 +53,8 @@ hand.
 | `--manifest PATH` | Attachment dedup manifest. Default: alongside input, `<name>.manifest.json`. |
 | `--dry-run` | Print what would change; no attachment upload, no document write, no comment post. |
 | `--auto-commit` | If Outline was edited manually since the last sync, commit the reconciliation patch instead of leaving it dirty for review. |
+| `--skip-validate` | Skip the pre-sync validation gate. |
+| `--validate-only` | Run the validation gate only; don't sync. |
 
 ## Why .qmd only, not .md
 
